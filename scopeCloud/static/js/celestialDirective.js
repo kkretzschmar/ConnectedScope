@@ -1,0 +1,36 @@
+var dashboardApp = angular.module('dashboard', ['ui.bootstrap']);
+
+
+dashboardApp.directive('celestialChart', [ '$compile', function($compile) {
+var directiveObj = {
+	restrict: 'E',
+	replace : false,
+    scope : {targetRA: '=targetRa', targetDEC: '=targetDec', index: '='},
+    link : function (scope, element, attrs) {
+
+	    var config = { 
+		center: [scope.targetRA,scope.targetDEC,0]  ,
+		width: 400,
+		// otherwise [degrees, degrees, degrees], 3rd parameter is orientation, null = default center
+		background: { fill: "#000000", stroke: "#000000", opacity: 1 }, // Background style
+		adaptable: true,    // Sizes are increased with higher zoom-levels
+		interactive: false,  // Enable zooming and rotation with mousewheel and dragging
+		controls: false,     // Display zoom controls
+		container: "celestial-map-",   // ID of parent element, e.g. div
+		datapath: "static/data/",  // Path/URL to data files, empty = subfolder 'data'
+
+	    };
+	    
+
+	    Celestial.display(config);
+	    Celestial.zoomBy(10);
+
+            element[0].parentNode.id = "celestial-map-"+scope.index;
+	
+	    d3.select(window).on('resize', function() {Celestial.resize();Celestial.zoomBy(10);} );
+          
+	
+	}
+    }
+    return directiveObj;
+}]);

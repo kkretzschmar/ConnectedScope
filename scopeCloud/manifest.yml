@@ -1,0 +1,9 @@
+applications:
+ - name: connectedScope
+   memory: 1024MB
+   disk_quota: 256MB
+   random-route: true
+   buildpack: python_buildpack
+   command: python scopeCloud.py
+   services:
+    - mymongo

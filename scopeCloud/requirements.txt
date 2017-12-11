@@ -1,0 +1,4 @@
+Flask
+unicorn
+flask-security==1.7.5
+flask-mongoengine

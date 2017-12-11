@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Signin Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel ="stylesheet" type= "text/css" href="{{ url_for('static',filename='css/bootstrap.min.css') }}" >
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="../../assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link rel ="stylesheet" type= "text/css" href="{{ url_for('static',filename='signin.css') }}" >
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="../../assets/js/ie-emulation-modes-warning.js"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div class="container">
+      {% from "security/_macros.html" import render_field_with_errors, render_field %}
+      {% include "security/_messages.html" %}
+
+      {% from "security/_macros.html" import render_field_with_errors, render_field %}
+      {% include "security/_messages.html" %}
+      <form action="{{ url_for_security('register') }}" method="POST" name="register_user_form" class="form-signin">
+	<h2 class="form-signin-heading">Register</h2>
+	{{ register_user_form.hidden_tag() }}
+	{{ render_field_with_errors(register_user_form.email, id="inputEmail", class="form-control", placeholder="Email address") }}
+	{{ render_field_with_errors(register_user_form.password,  id="inputPassword",class="form-control", placeholder="Password") }}
+	{% if register_user_form.password_confirm %}
+	{{ render_field_with_errors(register_user_form.password_confirm, class="form-control", placeholder="Confirm Password") }}
+	{% endif %}
+	{{ render_field(register_user_form.submit, class="btn btn-lg btn-primary btn-block") }}
+      </form>
+      <p class="text-center">Please <a href="{{ url_for('security.login') }}">login</a>.</p>
+    </div> <!-- /container -->
+
+   
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+  </body>
+</html>
+

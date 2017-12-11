@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+  <link rel="stylesheet" href="build/css/fontawesome-cheatsheet.min.css">
+  <link href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='overview.css') }}">
+  <link rel="stylesheet" type= "text/css" href="{{ url_for('static',filename='celestial.css') }}">
+  <link rel="stylesheet" href="../static/overview.css">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='css/d3.css') }}">
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.12.0.min.js"></script>
+  <script src="/static/js/lib/d3.min.js"></script>
+  <script src="/static/js/lib/d3.js"></script>
+  <script src="/static/js/lib/d3.geo.projection.min.js"></script>
+  <script src="/static/js/celestial.min.js"></script>
+  <script src="/static/js/celestial.js"></script>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="BackyardAstronomy.html"> Connectedscope</a>
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbar2SupportedContent" aria-controls="navbar2SupportedContent" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>
+      <div class="collapse navbar-collapse text-center justify-content-end" id="navbar2SupportedContent">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link text-white" href="BackyardAstronomy.html"> Home</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> {% if current_user.is_authenticated %} {{ current_user.email }} {% endif %} </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+              <a class="dropdown-item fa fa-user" href="#"> Profile</a>
+              <a class="dropdown-item fa fa-power-off" href="{{ url_for('security.logout') }}"> Logout</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Last observation:&nbsp;<span class="bg-light">{{ Frame.objects(user_email=current_user.email).order_by('-created')[0].created.strftime('%Y-%m-%d') }}</span></th>
+                <th>Objects:&nbsp; <span class="bg-light">{{ Frame.objects(user_email=current_user.email).distinct('targetName')|length }}</span></th>
+                <th>Exposure time&nbsp;[h]:&nbsp;<span class="bg-light">{{ (Frame.objects(user_email=current_user.email).sum('expTime') / 3600)|round(3, 'floor') }}</span></th>
+                <th>Frames:&nbsp; <span class="bg-light">{{ Frame.objects(user_email=current_user.email).sum('numOfFrames') }}</span></th>
+              </tr>
+            </thead>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="py-5">
+    <div class="container" ng-app="dashboard" ng-controller="calendarCtrl">
+      <div class="row border border-light">
+        <div class="col-md-12">
+          <p class="lead">Observations in&nbsp;{{ Now.year }}</p>
+          <div id="calenderView">
+            <calendar-chart begin-year="2017" end-year="2018" fdata="fdata"></calendar-chart>
+          </div>   
+          <div class="row py-3">
+            <div class="col-md-12"> 
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Target</th>
+                    <th>Filter</th>
+                    <th>Exposure Time</th>
+                    <th>Frames</th>
+                    <th>Created</th>
+                  </tr>
+                </thead>
+                <tbody>
+		  <tr ng-repeat-start="frame in fdata">
+		    {% raw %} 
+                    <td>{{ frame.targetName }}</td>
+                    <td>{{ frame.filterName }}</td>
+                    <td>{{ frame.expTime }}</td>
+                    <td>{{ frame.numOfFrames }}</td>
+                    <td>{{ frame.created['$date'] | date : 'dd-MM-yyyy HH:MM:ss' }}</td>
+		    {% endraw %}
+                    <td>
+                      <button ng-if="frame.isExpanded" ng-click="frame.isExpanded = false" type="button" class="btn btn-default btn-sm"  > <i class="fa fa-angle-up"></i> </button>
+		      <button ng-if="!frame.isExpanded" ng-click="frame.isExpanded = true" type="button" class="btn btn-default btn-sm"  > <i class="fa fa-angle-down"></i> </button>
+                    </td>
+                  </tr>
+		  {% raw %} 
+                  <tr ng-if="frame.isExpanded" ng-repeat-end=""  >
+                    <td colspan="6">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <table class="table">	    
+                            <tbody>
+                              <tr>
+                                <td>Binning X:</td>
+                                <td>{{frame.binningX}}</td>
+                              </tr>
+                              <tr>
+                                <td>Binning Y:</td>
+                                <td>{{frame.binningY}}</td>
+                              </tr>
+			      <tr>
+                                <td>Download directory:</td>
+                                <td>{{frame.download_dir}}</td>
+                              </tr>
+			      <tr>
+                                <td>Filname:</td>
+                                <td>{{frame.fileName}}</td>
+                              </tr>	      
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="col-md-6">
+			  <div id="celestial-map-">
+			    <celestial-chart target-ra="frame.coord.coordinates[0]/15" target-dec="frame.coord.coordinates[1]" index="$index"></celestial-chart>
+			  </div>
+			</div>
+                      </div>
+                    </td>
+                  </tr>
+		  {% endraw %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+   <script src="//d3js.org/d3.v4.min.js" charset="utf-8"></script>
+   <script src="/static/js/celestialDirective.js"></script>
+   <script src="/static/js/connectedScope.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+</body>
+
+</html>

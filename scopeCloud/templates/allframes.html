@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>connected Scope - all frames </title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel ="stylesheet" type= "text/css" href="{{ url_for('static',filename='css/bootstrap.min.css') }}" >
+
+    <!-- Custom styles for this template -->
+    <link rel ="stylesheet" type= "text/css" href="{{ url_for('static',filename='dashboard.css') }}" >
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{{ url_for('home') }}">Connected Scope</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">   
+            <li><a href="{{ url_for('home') }}">home</a></li>
+	    <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+		{% if current_user.is_authenticated %}
+		 {{ current_user.email }}
+		{% endif %}
+		<b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a href="#"><i class="fa fa-fw fa-user"></i> Profile</a>
+                </li>
+                <li class="divider"></li>
+                <li>
+                  <a href="{{ url_for('security.logout') }}"><i class="fa fa-fw fa-power-off"></i> Log Out</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+          <form class="navbar-form navbar-right">
+            <input type="text" class="form-control" placeholder="Search...">
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li class="active"><a href="{{ url_for('allFrames') }}">Overview <span class="sr-only">(current)</span></a></li>
+            <li><a href="{{ url_for('allFrames') }}">Frames</a></li>
+           
+          </ul>
+          
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header">All Frames - Overview</h1>
+
+          <div class="table-responsive filterable" ng-app="flist" ng-controller="listCtrl">
+	      <table class="table table-striped ">		
+	      <thead>
+                <tr class="filters">
+                  <th><input name="targetName" type="text" ng-model="search.targetName" class="form-control"  placeholder="Target"></th>
+		  <th><input name="eqCoord" type="text" ng-model="search.coordStr" class="form-control"  placeholder="Eq. Coords"></th>
+                    <th><input name="filterName" type="text" ng-model="search.filterName" class="form-control"  placeholder="Filter" ></th>
+                    <th><input name="binning" type="text" ng-model="search.binningStr" class="form-control"  placeholder="Binning" ></th>
+                    <th><input name="expTime" type="text" ng-model="search.expTime" class="form-control"  placeholder="Exposure Time" ></th>
+		    <th><input name="frames" type="text" ng-model="search.numOfFrames" class="form-control"  placeholder="Frames" ></th>
+		    <th><input name="created" type="text" ng-model="search.createdStr" class="form-control"  placeholder="Created" ></th>
+		    <th><input name="download_dir" type="text" ng-model="search.downloadDir" class="form-control"  placeholder="Download dir" ></th>
+                </tr>
+              </thead>
+
+	      <!--<thead>
+                <tr>
+                  <th>Target</th>
+                  <th>Filter</th>
+                  <th>Binning</th>
+                  <th>Exposure Time</th>
+		  <th>Frames</th>
+                  <th>Created</th>
+                </tr>
+              </thead>-->
+	      {% raw %}
+              <tbody>
+                <tr ng-repeat="item in frames | filter:search">
+                  <td>{{ item.targetName }}</td>
+		  <td>{{ item.coordStr }}</td>
+                  <td>{{ item.filterName }}</td>
+                  <td>{{ item.binningStr }}</td>
+                  <td>{{ item.expTime }}</td>
+		  <td>{{ item.numOfFrames }}</td>
+                  <td>{{ item.createdStr  }}</td>
+		  <td>{{ item.download_dir  }}</td>
+                </tr>
+              </tbody>
+	      {% endraw %}
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/connectedScope.js"></script>
+  </body>
+</html>
