@@ -23,11 +23,17 @@ app.config['OVERRIDE_FLASK_SCHEME'] = 'https'
 if 'VCAP_SERVICES' in os.environ:
     services = json.loads(os.getenv('VCAP_SERVICES'))
     mongo_env = services['mongodb'][0]['credentials']
-    app.config['MONGODB_DB'] = mongo_env['dbname']
-    app.config['MONGODB_HOST'] = mongo_env['hostname']
-    app.config['MONGODB_PORT'] = int(mongo_env['port'])
-    app.config['MONGODB_USERNAME'] = mongo_env['username']
-    app.config['MONGODB_PASSWORD'] = mongo_env['password']
+    app.config['MONGODB_SETTINGS'] = {
+        'username' : mongo_env['username'],
+        'password' : mongo_env['password'],
+        'host'     : mongo_env['uri'],
+        'db'       : mongo_env['dbname']
+    }
+    #app.config['MONGODB_DB'] = mongo_env['dbname']
+    #app.config['MONGODB_HOST'] = mongo_env['uri']
+    #app.config['MONGODB_PORT'] = 27017
+    #app.config['MONGODB_USERNAME'] = mongo_env['username']
+    #app.config['MONGODB_PASSWORD'] = mongo_env['password']
 else:
     app.config['MONGODB_DB'] = 'mydatabase'
     app.config['MONGODB_HOST'] = 'localhost'
@@ -116,7 +122,7 @@ def latestFramesData():
 def add_frame():
    # if not request.json or not 'target' in request.json:
    #     abort(400)
-    currentTime = datetime.datetime.now()
+    currentTime = datetime.now()
     coord = [request.json['ra']*15 - 360 if request.json['ra']*15 > 180   else request.json['ra']*15 , request.json['dec']]
     f = Frame(user_email=current_user.email,targetName=request.json['targetName'],filterName=request.json['filterName'],binningX=request.json['binningX'],binningY=request.json['binningY'],numOfFrames=request.json['numOfFrames'],expTime=request.json['expTime'], created=currentTime, download_dir=request.json['download_dir'], fileName=request.json['fileName'], coord=coord).save()
     return jsonify({'frame': f}), 201
@@ -126,7 +132,7 @@ def add_frame():
 def add_frame2():
    # if not request.json or not 'target' in request.json:
    #     abort(400)
-    currentTime = datetime.datetime.now()
+    currentTime = datetime.now()
     coord = [int(request.form['ra'])*15 - 360 if int(request.form['ra'])*15 > 180   else int(request.form['ra'])*15 , int(request.form['dec'])]
     f = Frame(user_email=current_user.email,targetName=request.form['targetName'],filterName=request.form['filterName'],binningX=request.form['binningX'],binningY=request.form['binningY'],numOfFrames=request.form['numOfFrames'],expTime=request.form['expTime'], created=currentTime, download_dir=request.form['download_dir'], fileName=request.form['fileName'], coord=coord).save()
     return jsonify({'frame': f}), 201

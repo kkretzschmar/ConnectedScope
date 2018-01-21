@@ -15,22 +15,60 @@ angular.module('flist', []).controller('listCtrl', function($scope, $http, $filt
 
 
 
-    dashboardApp.controller('calendarCtrl', [ '$scope', function($scope){
-	$scope.isExpanded = false;
+dashboardApp.controller('calendarCtrl', [ '$scope', '$http', function($scope,$http){
+
+    let currentYear = new Date().getFullYear();
+    let arrayList = [currentYear];
+        $http.get("/api/v1.0/get_dates")
+        .then(function(response){
+	    // create an array of years where observations were found
+	    for (item in response.data){
+		let year = new Date(response.data[item].date);
+		if (arrayList.indexOf(year.getFullYear()) === -1 ){
+		    arrayList.push(year.getFullYear());
+		}
+	    }
+	  }
+	)
+        
+        $scope.isExpanded = false;
 	$scope.fdata = [];
 	$scope.indexId = function(index) {
 	    return index;
 	}
-
+        $scope.years = arrayList;
+ 	        
+        $scope.selectedYear = currentYear;
+        $scope.selectYear = function(newYear) {
+	    $scope.selectedYear = newYear;
+	}
+	
     }])
     .directive("calendarChart", [ '$filter', function($filter) {
 	
     var directiveObj = {
 	restrict: 'E',
 	replace : false,
-	scope : {byear: '=beginYear', eyear: '=endYear', fdata: "="},
+	scope : { byear: '=beginYear', eyear: '=endYear', fdata: "="},
 	link : function (scope, element, attrs) {
-
+	    scope.$watch('byear',function(newVal,oldVal) {
+		if (newVal != oldVal){
+		    // remove the calendar chart
+		    removeChart();
+		    // replot the calendar chart
+		    plot();
+		    // remove details table entries
+		    scope.$parent.fdata = [];
+		}
+	    });
+	    
+	    plot();
+	    
+	    function removeChart() {
+		d3.select(element[0]).select("*").remove();
+	    }
+	    
+	    function plot() {
 	    var width = $("#calenderView").parent().width() - 30;
 	    yearHeight = width / 7,
 	    height = yearHeight ,
@@ -42,10 +80,9 @@ angular.module('flist', []).controller('listCtrl', function($scope, $http, $filt
 		.domain([-0.05, 0.05])
 		.range(["#a50026", "#d73027", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#d9ef8b", "#a6d96a", "#66bd63", "#1a9850", "#006837"]);
 	
-	    
 	    var svgS = d3.select(element[0])
 		.selectAll("svg")
-		.data(d3.range(scope.byear, scope.eyear))
+		.data(d3.range(scope.byear, parseInt(scope.eyear)+1))
 		.enter().append("svg")
 		.attr("width", width)
 		.attr("height", height);
@@ -97,8 +134,10 @@ angular.module('flist', []).controller('listCtrl', function($scope, $http, $filt
 		    .attr("fill", function(d) { return color(data[d]); })
 		    .append("title")
 		    .text(function(d) { return d + ": " + formatPercent(data[d]); });
-	    });
-
+	    
+	    } );
+	    }
+		
 	    function clickedDay(d){
 		d3.json("/allFramesData/"+d, function(error,jdata){
 		    if (error) throw error;
@@ -147,7 +186,8 @@ angular.module('flist', []).controller('listCtrl', function($scope, $http, $filt
 	    d3.select(window).on('resize', resize);
 	}
     }
-    return directiveObj;
+	    return directiveObj;
+	    
     } ] );
 
 

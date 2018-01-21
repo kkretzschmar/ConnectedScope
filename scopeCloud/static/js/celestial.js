@@ -173,7 +173,6 @@ Celestial.display = function(config) {
 	var delx = 0.68 / 2;
 	var dely = 0.5 / 2;
 	var frameCoord = cfg.center;
-	console.log(frameCoord);
 	var frameJson = {
 	    "type" : "FeatureCollection",
 	    "features" : [

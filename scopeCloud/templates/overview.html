@@ -64,9 +64,14 @@
     <div class="container" ng-app="dashboard" ng-controller="calendarCtrl">
       <div class="row border border-light">
         <div class="col-md-12">
-          <p class="lead">Observations in&nbsp;{{ Now.year }}</p>
+	  <div class="dropdown" >
+	  {% raw %}<span> Year of observation:</span> <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">{{selectedYear}}<span class="caret"></span></button>{% endraw %}
+    	    <ul id="year-of-observation-dropdown-menu" class="dropdown-menu" >
+    	      {% raw %} <li ng-repeat="year in years" ng-click="selectYear(year)">{{year}}</a></li> {% endraw %} 
+    	    </ul>
+	  </div>
           <div id="calenderView">
-            <calendar-chart begin-year="2017" end-year="2018" fdata="fdata"></calendar-chart>
+            <calendar-chart begin-year="selectedYear" end-year="selectedYear" fdata="fdata"></calendar-chart>
           </div>   
           <div class="row py-3">
             <div class="col-md-12"> 
