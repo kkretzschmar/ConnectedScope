@@ -66,10 +66,16 @@ class Frame(db.Document):
     numOfFrames = db.IntField(min_value=1)
     expTime = db.FloatField(min_value=0.001)
     coord = db.PointField()
+    equinox = db.FloatField(min_value=-273.15)
     created = db.DateTimeField()
     download_dir = db.StringField(max_length=255)
     fileName = db.StringField(max_length=255)
-
+    fileExt = db.StringField(max_length=255)
+    CCDTemp = db.FloatField(min_value=-273.15)
+    CCDCamera = db.StringField(max_length=255)
+    focalLength = db.FloatField(min_value=0)
+    apertureDia = db.FloatField(min_value=0)
+    frameType = db.StringField(max_length=255)
 
 # Setup Flask-Security
 user_datastore = MongoEngineUserDatastore(db, User, Role)
@@ -124,8 +130,13 @@ def add_frame():
    #     abort(400)
     currentTime = datetime.now()
     coord = [request.json['ra']*15 - 360 if request.json['ra']*15 > 180   else request.json['ra']*15 , request.json['dec']]
-    f = Frame(user_email=current_user.email,targetName=request.json['targetName'],filterName=request.json['filterName'],binningX=request.json['binningX'],binningY=request.json['binningY'],numOfFrames=request.json['numOfFrames'],expTime=request.json['expTime'], created=currentTime, download_dir=request.json['download_dir'], fileName=request.json['fileName'], coord=coord).save()
-    return jsonify({'frame': f}), 201
+    try:
+        f = Frame(user_email=current_user.email,targetName=request.json['targetName'],filterName=request.json['filterName'],binningX=request.json['binningX'],binningY=request.json['binningY'],numOfFrames=request.json['numOfFrames'],expTime=request.json['expTime'], created=request.json['dateObs'], download_dir=request.json['download_dir'], fileName=request.json['fileName'],  fileExt=request.json['fileExt'], coord=coord, equinox=request.json['equinox'], CCDTemp=request.json['CCDTemp'], CCDCamera=request.json['CCDCam'], focalLength=request.json['focalLen'], apertureDia=request.json['apertureDia'], frameType=request.json['frameType'] ).save()
+        return jsonify({'frame': f}), 201
+    except Exception as err:
+        return "%s" % err, 409
+    except:
+        return 500
 
 @app.route('/api/v1.0/add_frame2', methods=['POST'])
 @http_auth_required
