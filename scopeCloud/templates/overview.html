@@ -49,7 +49,13 @@
           <table class="table">
             <thead>
               <tr>
-                <th>Last observation:&nbsp;<span class="bg-light">{{ Frame.objects(user_email=current_user.email).order_by('-created')[0].created.strftime('%Y-%m-%d') }}</span></th>
+                <th>Last observation:&nbsp;<span class="bg-light">
+		    {% if Frame.objects(user_email=current_user.email).order_by('-created').count() is  greaterthan 0 %}
+		    {{ Frame.objects(user_email=current_user.email).order_by('-created')[0].created.strftime('%Y-%m-%d')  }}
+		    {% else %}
+		    No observation yet
+		    {% endif %}
+		</span></th>
                 <th>Objects:&nbsp; <span class="bg-light">{{ Frame.objects(user_email=current_user.email).distinct('targetName')|length }}</span></th>
                 <th>Exposure time&nbsp;[h]:&nbsp;<span class="bg-light">{{ (Frame.objects(user_email=current_user.email).sum('expTime') / 3600)|round(3, 'floor') }}</span></th>
                 <th>Frames:&nbsp; <span class="bg-light">{{ Frame.objects(user_email=current_user.email).sum('numOfFrames') }}</span></th>
@@ -81,18 +87,16 @@
                     <th>Target</th>
                     <th>Filter</th>
                     <th>Exposure Time</th>
-                    <th>Frames</th>
                     <th>Created</th>
                   </tr>
                 </thead>
                 <tbody>
-		  <tr ng-repeat-start="frame in fdata">
+		  <tr ng-repeat-start="frame in fdata"  >  
 		    {% raw %} 
                     <td>{{ frame.targetName }}</td>
                     <td>{{ frame.filterName }}</td>
                     <td>{{ frame.expTime }}</td>
-                    <td>{{ frame.numOfFrames }}</td>
-                    <td>{{ frame.created['$date'] | date : 'dd-MM-yyyy HH:MM:ss' }}</td>
+                    <td>{{ frame.created['$date'] | date : 'dd-MM-yyyy HH:mm:ss' }}</td>
 		    {% endraw %}
                     <td>
                       <button ng-if="frame.isExpanded" ng-click="frame.isExpanded = false" type="button" class="btn btn-default btn-sm"  > <i class="fa fa-angle-up"></i> </button>
@@ -100,12 +104,20 @@
                     </td>
                   </tr>
 		  {% raw %} 
-                  <tr ng-if="frame.isExpanded" ng-repeat-end=""  >
+                  <tr ng-if="frame.isExpanded" ng-repeat-end="">
                     <td colspan="6">
                       <div class="row">
                         <div class="col-md-6">
-                          <table class="table">	    
+                          <table class="table borderless bg-light">	    
                             <tbody>
+			      <tr>
+                                <td>Camera:</td>
+                                <td>{{frame.CCDCamera}}</td>
+                              </tr>
+			      <tr>
+                                <td>CCD Temperature:</td>
+                                <td>{{frame.CCDTemp}}</td>
+                              </tr>
                               <tr>
                                 <td>Binning X:</td>
                                 <td>{{frame.binningX}}</td>
@@ -121,7 +133,19 @@
 			      <tr>
                                 <td>Filname:</td>
                                 <td>{{frame.fileName}}</td>
-                              </tr>	      
+                              </tr>
+			      <tr>
+                                <td>Extension:</td>
+                                <td>{{frame.fileExt}}</td>
+                              </tr>
+			      <tr>
+                                <td>Telescope Aperture:</td>
+                                <td>{{frame.apertureDia}}</td>
+                              </tr>
+			      <tr>
+                                <td>Telescope Focal Length:</td>
+                                <td>{{frame.focalLength}}</td>
+                              </tr>
                             </tbody>
                           </table>
                         </div>

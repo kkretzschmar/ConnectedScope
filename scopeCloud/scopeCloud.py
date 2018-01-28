@@ -40,7 +40,7 @@ else:
     app.config['MONGODB_PORT'] = 27017
 
 app.config['SECURITY_REGISTERABLE'] = True
-#app.config['SECURITY_SEND_REGISTER_EMAIL'] = False
+app.config['SECURITY_SEND_REGISTER_EMAIL'] = False
 
 # Create database connection object
 db = MongoEngine(app)
@@ -110,7 +110,7 @@ def allFramesData(date):
     else:
         startDate = datetime.strptime(date,'%Y-%m-%d').replace(hour=0,minute=0,second=0)
         endDate = datetime.strptime(date,'%Y-%m-%d').replace(hour=23,minute=59,second=59)
-        objects = Frame.objects(user_email=current_user.email, created__gte=startDate, created__lte=endDate)
+        objects = Frame.objects(user_email=current_user.email, created__gte=startDate, created__lte=endDate).order_by('created')
     return objects.to_json(), 200
 
 @app.route('/latestFramesData', methods=['GET'])

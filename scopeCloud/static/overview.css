@@ -3790,6 +3790,10 @@ a.bg-dark:focus, a.bg-dark:hover {
 .border-white {
   border-color: #fff !important; }
 
+.borderless td, .borderless th {
+    border : none;
+}
+
 .rounded {
   border-radius: 0.25rem !important; }
 
