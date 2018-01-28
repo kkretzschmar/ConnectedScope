@@ -40,7 +40,9 @@ else:
     app.config['MONGODB_PORT'] = 27017
 
 app.config['SECURITY_REGISTERABLE'] = True
-app.config['SECURITY_SEND_REGISTER_EMAIL'] = False
+#app.config['SECURITY_SEND_REGISTER_EMAIL'] = True
+app.config['SECURITY_PASSWORD_HASH']="bcrypt"
+app.config['SECURITY_PASSWORD_SALT']="abc"
 
 # Create database connection object
 db = MongoEngine(app)
