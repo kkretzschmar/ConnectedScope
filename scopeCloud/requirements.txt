@@ -1,5 +1,5 @@
 Flask
 unicorn
 bcrypt
-flask-security==1.7.5
+flask-security
 flask-mongoengine
