@@ -40,7 +40,7 @@ else:
     app.config['MONGODB_PORT'] = 27017
 
 app.config['SECURITY_REGISTERABLE'] = True
-#app.config['SECURITY_SEND_REGISTER_EMAIL'] = True
+app.config['SECURITY_SEND_REGISTER_EMAIL'] = False
 app.config['SECURITY_PASSWORD_HASH']="bcrypt"
 app.config['SECURITY_PASSWORD_SALT']="abc"
 
@@ -78,6 +78,16 @@ class Frame(db.Document):
     focalLength = db.FloatField(min_value=0)
     apertureDia = db.FloatField(min_value=0)
     frameType = db.StringField(max_length=255)
+
+    #index definition
+    meta = {
+        'indexes' : [
+            {
+                'fields' : ['user_email', 'coord', 'equinox', 'created', 'apertureDia'],
+                'unique' : True 
+            }
+           ]
+        }
 
 # Setup Flask-Security
 user_datastore = MongoEngineUserDatastore(db, User, Role)
@@ -132,6 +142,7 @@ def add_frame():
    #     abort(400)
     currentTime = datetime.now()
     coord = [request.json['ra']*15 - 360 if request.json['ra']*15 > 180   else request.json['ra']*15 , request.json['dec']]
+    print request.json
     try:
         f = Frame(user_email=current_user.email,targetName=request.json['targetName'],filterName=request.json['filterName'],binningX=request.json['binningX'],binningY=request.json['binningY'],numOfFrames=request.json['numOfFrames'],expTime=request.json['expTime'], created=request.json['dateObs'], download_dir=request.json['download_dir'], fileName=request.json['fileName'],  fileExt=request.json['fileExt'], coord=coord, equinox=request.json['equinox'], CCDTemp=request.json['CCDTemp'], CCDCamera=request.json['CCDCam'], focalLength=request.json['focalLen'], apertureDia=request.json['apertureDia'], frameType=request.json['frameType'] ).save()
         return jsonify({'frame': f}), 201
